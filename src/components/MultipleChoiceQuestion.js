@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
-import { Text, StyleSheet, Button, Animated } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, StyleSheet, Button, View } from "react-native";
 
 import Divider from "./Divider";
+
+import _ from "lodash";
 
 function AnswerButton({ children, checkAnswer }) {
   return <Button onPress={checkAnswer} title={children} color="#70a1e6" />;
@@ -9,44 +11,34 @@ function AnswerButton({ children, checkAnswer }) {
 
 export default function MultipleChoiceQuestion({
   prompt,
-  proposedAnswers,
+  allAnswers,
   actualAnswer,
-  onAnswer,
+  handleAnswer,
 }) {
-  const pos = new Animated.ValueXY({ x: -300, y: 0 });
+  const [proposedAnswers, setProposedAnswers] = useState([]);
 
-  const animate_in = () => {
-    Animated.spring(pos, {
-      toValue: { x: 0, y: 0 },
-      bounciness: 0,
-      speed: 30,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const animate_out = (callback) => {
-    Animated.spring(pos, {
-      toValue: { x: 400, y: 0 },
-      bounciness: 0,
-      speed: 30,
-      useNativeDriver: false,
-    }).start(callback);
-  };
-
-  useEffect(() => animate_in(), [pos]);
-
-  const checkAnswer = (isRightAnswer) => {
-    animate_out(() => onAnswer(isRightAnswer));
-  };
+  // Sample answers on mount
+  useEffect(() => {
+    let answer = actualAnswer;
+    let randomSample = _.sampleSize(allAnswers, 4);
+    if (!randomSample.includes(answer)) {
+      randomSample.pop();
+      randomSample.push(answer);
+    }
+    randomSample = _.shuffle(randomSample);
+    setProposedAnswers(randomSample);
+  }, [prompt]);
 
   const renderAnswers = (proposedAnswers, actualAnswer) => {
+    console.log(proposedAnswers);
+
     return proposedAnswers.map((proposedAnswer, index) => {
       let isRightAnswer = proposedAnswer === actualAnswer;
 
       return (
         <AnswerButton
           key={index}
-          checkAnswer={() => checkAnswer(isRightAnswer)}
+          checkAnswer={() => handleAnswer(isRightAnswer)}
         >
           {proposedAnswer}
         </AnswerButton>
@@ -55,16 +47,11 @@ export default function MultipleChoiceQuestion({
   };
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        { transform: [{ translateX: pos.x }, { translateY: pos.y }] },
-      ]}
-    >
+    <View>
       <Text style={styles.prompt}>{`${prompt}`}</Text>
       <Divider />
       {renderAnswers(proposedAnswers, actualAnswer)}
-    </Animated.View>
+    </View>
   );
 }
 

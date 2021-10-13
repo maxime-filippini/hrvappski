@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Button } from "react-native";
 import _ from "lodash";
 
-import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
-import TypedQuestion from "./TypedQuestion";
+import Question from "./Question";
 
 export default function QuizComponent({
   navigation,
@@ -22,7 +21,7 @@ export default function QuizComponent({
 
   let allAnswers = Object.values(questions);
 
-  // On mount
+  // On mount, setup questions
   useEffect(() => {
     let shuffledQuestions = _.shuffle(Object.keys(questions)).slice(
       0,
@@ -38,6 +37,7 @@ export default function QuizComponent({
     setTotalQuestions(shuffledQuestions.length);
   }, []);
 
+  // Process to go to next question
   const goToNextQuestion = () => {
     setRemainingQuestions(remainingQuestions.slice(1));
 
@@ -48,6 +48,7 @@ export default function QuizComponent({
     setCurrentQuestion(question);
   };
 
+  // Quiz-level handling of answers
   const handleQuestionAnswer = (wasAnswerRight) => {
     if (wasAnswerRight) {
       setScore(() => score + 1);
@@ -59,36 +60,7 @@ export default function QuizComponent({
     }
   };
 
-  const buildTypedQuestion = (qstn) => {
-    return (
-      <TypedQuestion
-        prompt={qstn["question"]}
-        actualAnswer={qstn["answer"]}
-        onAnswer={handleQuestionAnswer}
-      />
-    );
-  };
-
-  const buildMultipleChoiceQuestion = (qstn, allAnswers) => {
-    let answer = qstn["answer"];
-    let randomSample = _.sampleSize(allAnswers, 4);
-    if (!randomSample.includes(answer)) {
-      randomSample.pop();
-      randomSample.push(answer);
-    }
-
-    randomSample = _.shuffle(randomSample);
-
-    return (
-      <MultipleChoiceQuestion
-        prompt={qstn["question"]}
-        proposedAnswers={randomSample}
-        actualAnswer={answer}
-        onAnswer={handleQuestionAnswer}
-      />
-    );
-  };
-
+  // Rendering
   const renderQuiz = () => {
     if (!hasStarted) {
       return <Button title="Start Quiz!" onPress={() => setHasStarted(true)} />;
@@ -97,9 +69,13 @@ export default function QuizComponent({
         <>
           <Text style={styles.scoreHeader}>{"Score:"}</Text>
           <Text style={styles.highScore}>{score}</Text>
-          {answerType === "multiple-choice"
-            ? buildMultipleChoiceQuestion(currentQuestion, allAnswers)
-            : buildTypedQuestion(currentQuestion)}
+          <Question
+            prompt={currentQuestion["question"]}
+            allAnswers={allAnswers}
+            actualAnswer={currentQuestion["answer"]}
+            answerType={answerType}
+            quizHandleAnswer={handleQuestionAnswer}
+          />
         </>
       );
     } else {

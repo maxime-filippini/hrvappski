@@ -1,29 +1,39 @@
-import React, { useState, useEffect } from "react";
-import { Text, StyleSheet, Button, Animated, TextInput } from "react-native";
+import React, { useState, useRef } from "react";
+import { Text, StyleSheet, Button, View, TextInput } from "react-native";
 
 import Divider from "./Divider";
 
-export default function MultipleChoiceQuestion({
+const validate = (answer, actualAnswer) => {
+  let chars = {
+    č: "c",
+    ć: "c",
+    ž: "z",
+    đ: "d",
+    š: "s",
+  };
+
+  let newAnswer = answer;
+  let newActualAnswer = actualAnswer;
+
+  Object.keys(chars).forEach(
+    (char) => (newAnswer = newAnswer.replace(char, chars[char]))
+  );
+  Object.keys(chars).forEach(
+    (char) => (newActualAnswer = newActualAnswer.replace(char, chars[char]))
+  );
+
+  return (
+    newAnswer.trim().toLowerCase() === newActualAnswer.trim().toLowerCase()
+  );
+};
+
+export default function TypedQuestion({
   prompt,
   actualAnswer,
-  onAnswer,
+  handleAnswer,
+  refTextInput,
 }) {
   const [input, setInput] = useState("");
-
-  const pos = new Animated.ValueXY({ x: 0, y: 0 });
-
-  const animate_out = (callback) => {
-    Animated.spring(pos, {
-      toValue: { x: 400, y: 0 },
-      bounciness: 0,
-      speed: 30,
-      useNativeDriver: false,
-    }).start(callback);
-  };
-
-  const checkAnswer = (isRightAnswer) => {
-    animate_out(() => onAnswer(isRightAnswer));
-  };
 
   const renderInputField = (actualAnswer) => {
     return (
@@ -31,9 +41,11 @@ export default function MultipleChoiceQuestion({
         placeholder="Write answer"
         keyboardType="default"
         value={input}
+        autoFocus={true}
+        ref={refTextInput}
         onChangeText={(v) => setInput(v)}
         onSubmitEditing={(v) => {
-          checkAnswer(v === actualAnswer);
+          handleAnswer(validate(input, actualAnswer));
           setInput("");
         }}
       />
@@ -41,16 +53,11 @@ export default function MultipleChoiceQuestion({
   };
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        { transform: [{ translateX: pos.x }, { translateY: pos.y }] },
-      ]}
-    >
+    <View>
       <Text style={styles.prompt}>{`${prompt}`}</Text>
       <Divider />
       {renderInputField(actualAnswer)}
-    </Animated.View>
+    </View>
   );
 }
 
