@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { Text, View, StyleSheet, Animated } from "react-native";
 
+import createStyles from "../styles/base";
+
+const baseStyles = createStyles();
+
 export default function HomeScreen() {
   const fadeAnim = new Animated.Value(0);
   const fadeAnim2 = new Animated.Value(0);
@@ -23,9 +27,9 @@ export default function HomeScreen() {
   useEffect(animation, []);
 
   return (
-    <View style={styles.container}>
+    <View style={baseStyles.container}>
       <Animated.View style={[{ opacity: fadeAnim }]}>
-        <Text style={styles.title}>
+        <Text style={baseStyles.title}>
           <Text>Hrv</Text>
           <Text style={{ color: "#65696b", fontStyle: "italic" }}>app</Text>
           <Text>ski</Text>
@@ -34,7 +38,7 @@ export default function HomeScreen() {
       <Animated.View style={[{ opacity: fadeAnim2 }]}>
         <Text
           style={[
-            styles.title,
+            baseStyles.title,
             { fontSize: 30, color: "#65696b", fontStyle: "italic" },
           ]}
         >
@@ -46,14 +50,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#edeff0",
-  },
   title: {
     fontSize: 40,
-    margin: 0,
   },
 });

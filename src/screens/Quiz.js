@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet, Button } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import FromQuizScreen from "./FromQuiz";
-import ToQuizScreen from "./ToQuiz";
+import MultipleAnswersQuiz from "./MultipleAnswersQuiz";
+
+import _ from "lodash";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,29 +17,27 @@ const QuizSelectScreen = ({ navigation }) => {
       </View>
       <View style={{ flex: 2 }}>
         <Button
-          title="Hrvatski na Engleski"
+          title="Nouns"
           color="#233D4D"
-          onPress={() => navigation.navigate("FromQuiz")}
+          onPress={() => navigation.navigate("Nouns")}
         />
+
         <Button
-          title="Engelski na Hrvatski"
-          color="#FE7F2D"
-          onPress={() => navigation.navigate("ToQuiz")}
+          title="Verbs"
+          color="#233D4D"
+          onPress={() => navigation.navigate("Verbs")}
         />
+
         <Button
-          title="Placeholder"
-          color="#A1C181"
-          onPress={() => navigation.navigate("ToQuiz")}
+          title="Sayings"
+          color="#233D4D"
+          onPress={() => navigation.navigate("Sayings")}
         />
+
         <Button
-          title="Placeholder"
-          color="#619B8A"
-          onPress={() => navigation.navigate("ToQuiz")}
-        />
-        <Button
-          title="Placeholder"
-          color="#073B4C"
-          onPress={() => navigation.navigate("ToQuiz")}
+          title="Everything goes!"
+          color="#233D4D"
+          onPress={() => navigation.navigate("Everything goes")}
         />
       </View>
       <View style={{ flex: 2 }} />
@@ -46,7 +45,13 @@ const QuizSelectScreen = ({ navigation }) => {
   );
 };
 
-export default function QuizScreen({ navigation }) {
+export default function QuizScreen({ questions, settings }) {
+  let everythingGoes = Object.keys(questions)
+    .map((key) => questions[key])
+    .reduce((prev, curr) => {
+      return { ...prev, ...curr };
+    });
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -55,17 +60,45 @@ export default function QuizScreen({ navigation }) {
         options={{ headerShown: false }}
       />
 
-      <Stack.Screen
-        name="FromQuiz"
-        component={FromQuizScreen}
-        options={{ headerShown: true }}
-      />
+      <Stack.Screen name="Nouns" options={{ headerShown: true }}>
+        {(props) => (
+          <MultipleAnswersQuiz
+            {...props}
+            questions={questions["nouns"]}
+            nQuestions={settings["numberOfQuestions"]}
+          />
+        )}
+      </Stack.Screen>
 
-      <Stack.Screen
-        name="ToQuiz"
-        component={ToQuizScreen}
-        options={{ headerShown: true }}
-      />
+      <Stack.Screen name="Verbs" options={{ headerShown: true }}>
+        {(props) => (
+          <MultipleAnswersQuiz
+            {...props}
+            questions={questions["verbs"]}
+            nQuestions={settings["numberOfQuestions"]}
+          />
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="Sayings" options={{ headerShown: true }}>
+        {(props) => (
+          <MultipleAnswersQuiz
+            {...props}
+            questions={questions["sayings"]}
+            nQuestions={settings["numberOfQuestions"]}
+          />
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="Everything goes" options={{ headerShown: true }}>
+        {(props) => (
+          <MultipleAnswersQuiz
+            {...props}
+            questions={everythingGoes}
+            nQuestions={settings["numberOfQuestions"]}
+          />
+        )}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }

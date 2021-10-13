@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, Button, Animated } from "react-native";
+import React, { useEffect } from "react";
+import { Text, StyleSheet, Button, Animated } from "react-native";
+
+import Divider from "./Divider";
 
 function AnswerButton({ children, checkAnswer }) {
   return <Button onPress={checkAnswer} title={children} color="#70a1e6" />;
 }
 
-function Divider() {
-  return <View style={styles.divider} />;
-}
-
-export default function Question({
+export default function MultipleChoiceQuestion({
   prompt,
   proposedAnswers,
   actualAnswer,
@@ -79,12 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#fff",
   },
-  divider: {
-    borderBottomColor: "#c4c2c4",
-    borderBottomWidth: 1,
-    marginTop: 10,
-    marginBottom: 10,
-  },
+
   prompt: {
     fontSize: 20,
     color: "#0f228a",
