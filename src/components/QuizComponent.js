@@ -97,7 +97,7 @@ export default function QuizComponent({
         <>
           <Text style={styles.scoreHeader}>{"Score:"}</Text>
           <Text style={styles.highScore}>{score}</Text>
-          {answerType === "multiplechoice"
+          {answerType === "multiple-choice"
             ? buildMultipleChoiceQuestion(currentQuestion, allAnswers)
             : buildTypedQuestion(currentQuestion)}
         </>
